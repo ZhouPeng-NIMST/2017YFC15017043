@@ -8,7 +8,7 @@ import os,re
 def transform(matched):
     if matched.group() in [' 08:00',' 08:01']:
         return '-00'
-    elif matched.group() in [' 12:00',' 12:01']:
+    elif matched.group() in [' 20:00',' 20:01']:
         return '-12'
     else:
         return '-' + matched.group()[1:]
@@ -33,7 +33,7 @@ def get_0012_FromLV1_Prettify(pathIn,pathOut):
         f = pd.read_csv(path)
         for i,time in enumerate(f.iloc[:,0]):
     #       get bt of time chosed
-            if re.search(r'08:00|12:00|08:01|12:01',time):
+            if re.search(r'08:00|20:00|08:01|20:01',time):
                 date_formated = format_date(time)
                 f.iloc[i,0] = date_formated
                 if date_formated not in time_judge:
