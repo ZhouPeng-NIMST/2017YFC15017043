@@ -1,24 +1,9 @@
-
 # coding: utf-8
-
-# In[ ]:
-
-
-'''
-获取亮温数据，按照相应格式写好
-'''
-
-
-# In[ ]:
-
+#获取亮温数据，按照相应格式写好
 
 import pandas as pd
 import os
 import re
-
-
-# In[ ]:
-
 
 def getBtfromLV1(pathIn,pathOut):
     #   if pathOut not exists,build new one.mikdir/makedirs
@@ -54,9 +39,6 @@ def getBtfromLV1(pathIn,pathOut):
             bt_all.to_csv(os.path.join(pathOut,filename),index= None,header=None)
         else:
             continue
-
-
-# In[ ]:
 
 
 if __name__ == '__main__':
