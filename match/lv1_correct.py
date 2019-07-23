@@ -1,5 +1,4 @@
 # coding: utf-8
-
 import numpy as np
 import pandas as pd
 import os 
@@ -12,8 +11,8 @@ def get_correct(data):
     idx_mon_1 = {'2018-01':-1,'2018-02':-1,'2018-03':-1,'2018-04':-1,'2018-05':-1,
                  '2018-06':-1,'2018-07':-1,'2018-08':-1,'2018-09':-1,'2018-10':-1}
 
-    wb_mon = {'2018-01':[-1,-1],'2018-02':[-1,-1],'2018-03':[-1,-1],'2018-04':[-1,-1],'2018-05':[-1,-1],
-              '2018-06':[-1,-1],'2018-07':[-1,-1],'2018-08':[-1,-1],'2018-09':[-1,-1],'2018-10':[-1,-1]}
+    wb_mon = {'2018-01':[-1,-1,-1],'2018-02':[-1,-1,-1],'2018-03':[-1,-1,-1],'2018-04':[-1,-1,-1],'2018-05':[-1,-1,-1],
+              '2018-06':[-1,-1,-1],'2018-07':[-1,-1,-1],'2018-08':[-1,-1,-1],'2018-09':[-1,-1,-1],'2018-10':[-1,-1,-1]}
 
     # record ids of every month
     for i , date in enumerate(data.iloc[:,0]):
@@ -25,27 +24,36 @@ def get_correct(data):
     # calculate correct w/b
     last_mon = ''
     for o in idx_mon_1:
+        e = []
         w = []
         b = []
         idx = idx_mon_1[o]
         if idx != -1:
             lv1, mono = data.iloc[idx-60:idx,1:18].values, data.iloc[idx-60:idx,19:].values
+#             lv1, mono = data.iloc[:,1:18].values, data.iloc[:,19:].values
             # delete some error data
             abs_err = abs(lv1[:,9] - mono[:,9])
-            idx_del = np.where(abs_err >= 0.8*(abs_err.max()))[0]
+            idx_del = np.where(abs_err >= 0.95*(abs_err.max()))[0]
             lv1 = np.delete(lv1,idx_del,axis = 0)
             mono = np.delete(mono,idx_del,axis = 0)
             for j in range(17):
-                f = np.polyfit(lv1[:,j],mono[:,j],1)
+                e_j = mono[:,j].mean() - lv1[:,j].mean()
+                f = np.polyfit(lv1[:,j] + e_j, mono[:,j],1)
+                e.append(e_j)
                 w.append(f[0])
                 b.append(f[1])
-            wb_mon[o][0] = w
-            wb_mon[o][1] = b
+            wb_mon[o][0] = e
+            wb_mon[o][1] = w
+            wb_mon[o][2] = b
             last_mon = o
-        else:
+        elif last_mon != '':
             wb_mon[o][0] = wb_mon[last_mon][0]
             wb_mon[o][1] = wb_mon[last_mon][1]
-
+            wb_mon[o][2] = wb_mon[last_mon][2]
+        elif last_mon == '':
+            wb_mon[o][0] = 0
+            wb_mon[o][1] = 0
+            wb_mon[o][2] = 0
     return wb_mon
 
 if __name__ == '__main__':
